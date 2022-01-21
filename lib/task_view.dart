@@ -177,8 +177,14 @@ class _TaskViewState extends State<TaskView> {
                                       value: Boxes.getTasks().getAt(index)!.checked,
                                       activeColor: Colors.green,
                                       onChanged: (val) {
+                                        TaskNew oldTask = Boxes.getTasks().getAt(index)!;
+                                        TaskNew newTask = TaskNew()
+                                          ..checked = val!
+                                          ..header = oldTask.header
+                                          ..body = oldTask.body
+                                          ..marked = oldTask.marked;
                                         setState(() {
-                                          Boxes.getTasks().getAt(index)!.checked = val!;
+                                          Boxes.getTasks().putAt(index, newTask);
                                         });
                                       },
                                     ),
@@ -202,8 +208,14 @@ class _TaskViewState extends State<TaskView> {
                                     }
                                   },
                                   onDoubleTap: () {
+                                    TaskNew oldTask = Boxes.getTasks().getAt(index)!;
+                                    TaskNew newTask = TaskNew()
+                                      ..checked = oldTask.checked
+                                      ..header = oldTask.header
+                                      ..body = oldTask.body
+                                      ..marked = !oldTask.marked;
                                     setState(() {
-                                      Boxes.getTasks().getAt(index)!.marked = !Boxes.getTasks().getAt(index)!.marked;
+                                      Boxes.getTasks().putAt(index, newTask);
                                     });
                                   },
                                   child: Text(
@@ -212,7 +224,9 @@ class _TaskViewState extends State<TaskView> {
                                       fontSize: 24,
                                       fontWeight: FontWeight.w600,
                                       color: (Boxes.getTasks().getAt(index)!.checked)
-                                          ? CustomTheme.textPrimaryNormal()
+                                          ? (Boxes.getTasks().getAt(index)!.marked)
+                                              ? CustomTheme.secondary()
+                                              : CustomTheme.textPrimaryNormal()
                                           : (Boxes.getTasks().getAt(index)!.marked)
                                               ? CustomTheme.primary()
                                               : CustomTheme.textPrimaryStrong(),

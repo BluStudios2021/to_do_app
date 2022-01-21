@@ -9,9 +9,10 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> with SingleTickerProviderStateMixin {
   Color currentColor = CustomTheme.primary();
+  Color secondaryColor = CustomTheme.secondary();
   Color previousColor = CustomTheme.primary();
 
-  List<Color> colors = [
+  List<Color> primaryColors = [
     Colors.deepOrange,
     Colors.red,
     Colors.pink,
@@ -32,6 +33,29 @@ class _SettingsState extends State<Settings> with SingleTickerProviderStateMixin
     Colors.brown,
     Colors.grey,
     Colors.blueGrey,
+  ];
+
+  List<Color> secondaryColors = [
+    Colors.deepOrange[300]!,
+    Colors.red[300]!,
+    Colors.pink[300]!,
+    Colors.purple[300]!,
+    Colors.deepPurple[300]!,
+    Colors.indigo[300]!,
+    Colors.blue[300]!,
+    Colors.lightBlue[300]!,
+    Colors.cyan[300]!,
+    Colors.teal[300]!,
+    Colors.green[600]!,
+    Colors.green[300]!,
+    Colors.lightGreen[300]!,
+    Colors.lime[300]!,
+    Colors.yellow[300]!,
+    Colors.amber[300]!,
+    Colors.orange[300]!,
+    Colors.brown[300]!,
+    Colors.grey[300]!,
+    Colors.blueGrey[300]!,
   ];
 
   late AnimationController controller;
@@ -130,7 +154,8 @@ class _SettingsState extends State<Settings> with SingleTickerProviderStateMixin
                     onTap: () async {
                       setState(() {
                         previousColor = currentColor;
-                        currentColor = colors[i];
+                        currentColor = primaryColors[i];
+                        secondaryColor = secondaryColors[i];
                       });
                       controller.reset();
                       await controller.forward();
@@ -138,10 +163,10 @@ class _SettingsState extends State<Settings> with SingleTickerProviderStateMixin
                     child: Container(
                       padding: const EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
-                        color: colors[i],
+                        color: primaryColors[i],
                         shape: BoxShape.circle,
                       ),
-                      child: (colors.indexOf(currentColor) == i)
+                      child: (primaryColors.indexOf(currentColor) == i)
                           ? const FittedBox(
                               child: Icon(
                                 Icons.check_rounded,
@@ -161,6 +186,7 @@ class _SettingsState extends State<Settings> with SingleTickerProviderStateMixin
                 onPressed: () {
                   setState(() {
                     CustomTheme.setPrimary(currentColor);
+                    CustomTheme.setSecondary(secondaryColor);
                   });
                   Navigator.pop(context);
                 },

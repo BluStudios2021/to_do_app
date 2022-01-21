@@ -2,14 +2,24 @@ import 'package:flutter/material.dart';
 import 'boxes.dart';
 
 class CustomTheme {
+  static setPrimary(Color color) {
+    Boxes.getColors().put('primary', color);
+  }
+
+  static setSecondary(Color color) {
+    Boxes.getColors().put('secondary', color);
+  }
+
   static Color primary() {
     Color? color = Boxes.getColors().get('primary');
     color ??= Colors.amber;
     return color;
   }
 
-  static setPrimary(Color color) {
-    Boxes.getColors().put('primary', color);
+  static Color secondary() {
+    Color? color = Boxes.getColors().get('secondary');
+    color ??= Colors.amber[300]!;
+    return color;
   }
 
   static Color background() {

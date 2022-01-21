@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
-import 'package:to_do_app/model/task.dart';
 import 'package:to_do_app/model/task_new.dart';
 
 class Boxes {

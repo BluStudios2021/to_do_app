@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 part 'task_new.g.dart';
 
 @HiveType(typeId: 1)
-class TaskNew {
+class TaskNew extends HiveObject {
   @HiveField(0)
   bool checked = false;
 

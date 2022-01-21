@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:to_do_app/model/task.dart';
 import 'package:to_do_app/model/task_new.dart';
 import 'homepage.dart';
 
@@ -9,26 +8,10 @@ void main() async {
 
   await Hive.initFlutter();
 
-  Hive.registerAdapter(TaskAdapter());
-  Hive.registerAdapter(TaskNewAdapter());
+  Hive.registerAdapter<TaskNew>(TaskNewAdapter());
   Hive.registerAdapter(ColorAdapter());
-  await Hive.openBox<Task>('tasks');
   await Hive.openBox<TaskNew>('tasks_new');
   await Hive.openBox<Color>('colors');
-
-  if (Hive.box<Task>('tasks').isNotEmpty) {
-    for (int i = 0; i < Hive.box<Task>('tasks').length; i++) {
-      Task task = Hive.box<Task>('tasks').getAt(i)!;
-      Hive.box<TaskNew>('tasks_new').add(
-        TaskNew()
-          ..checked = task.checked
-          ..header = task.header
-          ..body = task.body
-          ..marked = false,
-      );
-    }
-    Hive.box<Task>('tasks').clear();
-  }
 
   runApp(const MyApp());
 }
@@ -47,7 +30,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    Hive.box('tasks').close();
     Hive.box('colors').close();
     Hive.box('tasks_new').close();
     super.dispose();
