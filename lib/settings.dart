@@ -138,7 +138,11 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
       body: Column(
         children: [
           Container(
-            margin: const EdgeInsets.all(8.0),
+            margin: const EdgeInsets.only(
+              left: 8.0,
+              top: 8.0,
+              right: 8.0,
+            ),
             decoration: BoxDecoration(
               color: CustomTheme.taskBox(),
               borderRadius: BorderRadius.circular(12.0),
@@ -275,16 +279,20 @@ class _SettingsState extends State<Settings> with TickerProviderStateMixin {
               ),
             ),
           ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 200),
-            reverseDuration: const Duration(milliseconds: 200),
-            alignment: Alignment.topRight,
-            child: Container(
-              margin: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: CustomTheme.taskBox(),
-                borderRadius: BorderRadius.circular(12.0),
-              ),
+          Container(
+            margin: const EdgeInsets.only(
+              left: 8.0,
+              top: 8.0,
+              right: 8.0,
+            ),
+            decoration: BoxDecoration(
+              color: CustomTheme.taskBox(),
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              reverseDuration: const Duration(milliseconds: 200),
+              alignment: Alignment.topRight,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisSize: MainAxisSize.min,
