@@ -157,7 +157,7 @@ class _EditTaskState extends State<EditTask> {
       body: Container(
         margin: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: CustomTheme.boxTask(),
+          color: CustomTheme.taskBox(),
           borderRadius: BorderRadius.circular(8.0),
         ),
         padding: const EdgeInsets.only(

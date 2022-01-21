@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: OpenContainer(
         transitionDuration: const Duration(milliseconds: 600),
         transitionType: ContainerTransitionType.fade,
-        openColor: CustomTheme.boxTask(),
+        openColor: CustomTheme.taskBox(),
         openShape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
         openElevation: 0.0,
         closedColor: CustomTheme.primary(),

@@ -10,6 +10,14 @@ class CustomTheme {
     Boxes.getColors().put('secondary', color);
   }
 
+  static setCheckBox(Color color) {
+    Boxes.getColors().put('check_box', color);
+  }
+
+  static setCheck(Color color) {
+    Boxes.getColors().put('check', color);
+  }
+
   static Color primary() {
     Color? color = Boxes.getColors().get('primary');
     color ??= Colors.amber;
@@ -50,7 +58,19 @@ class CustomTheme {
     return Colors.grey[600]!;
   }
 
-  static Color boxTask() {
+  static Color taskBox() {
     return const Color(0xFF303030);
+  }
+
+  static Color checkBox() {
+    Color? color = Boxes.getColors().get('check_box');
+    color ??= Colors.green[500]!;
+    return color;
+  }
+
+  static Color check() {
+    Color? color = Boxes.getColors().get('check');
+    color ??= Colors.green[500]!;
+    return color;
   }
 }

@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'fade_animation.dart';
 import 'edit_task.dart';
 import 'model/task_new.dart';
 import 'theme.dart';
@@ -26,10 +26,6 @@ class _TaskViewState extends State<TaskView> {
         shadowColor: Colors.transparent,
       ),
       child: ReorderableListView(
-        key: UniqueKey(),
-        physics: const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(),
-        ),
         onReorder: (oldIndex, newIndex) {
           if (showExpanded == 0) {
             null;
@@ -75,225 +71,167 @@ class _TaskViewState extends State<TaskView> {
         },
         children: [
           for (int index = 0; index < Boxes.getTasks().length; index++)
-            Dismissible(
+            Container(
               key: UniqueKey(),
-              onDismissed: (direction) {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                recentlyRemoved = Boxes.getTasks().getAt(index);
-                setState(() {
-                  Boxes.getTasks().deleteAt(index);
-                });
-
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    duration: const Duration(seconds: 3),
-                    backgroundColor: CustomTheme.background(),
-                    elevation: 0.0,
-                    dismissDirection: DismissDirection.startToEnd,
-                    padding: const EdgeInsets.all(8.0),
-                    content: FadeAnimation(
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                          left: 16.0,
-                          top: 12.0,
-                          right: 16.0,
-                          bottom: 12.0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: CustomTheme.boxTask(),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              margin: const EdgeInsets.only(
+                left: 6.0,
+                top: 8.0,
+                right: 6.0,
+              ),
+              child: OpenContainer(
+                tappable: false,
+                transitionDuration: const Duration(milliseconds: 600),
+                transitionType: ContainerTransitionType.fade,
+                openColor: CustomTheme.taskBox(),
+                openShape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                openElevation: 0.0,
+                closedColor: CustomTheme.taskBox(),
+                closedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                closedElevation: 0.0,
+                openBuilder: (context, _) => EditTask(index: index + 1),
+                closedBuilder: (context, VoidCallback openContainer) => Container(
+                  padding: const EdgeInsets.all(2.0),
+                  child: AnimatedSize(
+                    duration: const Duration(milliseconds: 200),
+                    reverseDuration: const Duration(milliseconds: 200),
+                    alignment: Alignment.topRight,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(recentlyRemoved!.header + ' got removed!',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                )),
-                            InkWell(
-                              customBorder: const RoundedRectangleBorder(),
-                              onTap: () {
-                                setState(() {
-                                  if (recentlyRemoved != null) {
-                                    Boxes.getTasks().add(recentlyRemoved!);
-                                  }
-                                  recentlyRemoved = null;
-                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                });
-                              },
-                              child: Text(
-                                'UNDO',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w600,
-                                  color: CustomTheme.primary(),
+                            Center(
+                              child: SizedBox(
+                                width: 42,
+                                height: 42,
+                                child: Transform.scale(
+                                  scale: 1.25,
+                                  child: Checkbox(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                    value: Boxes.getTasks().getAt(index)!.checked,
+                                    activeColor: CustomTheme.checkBox(),
+                                    checkColor: Colors.black,
+                                    onChanged: (val) {
+                                      TaskNew oldTask = Boxes.getTasks().getAt(index)!;
+                                      TaskNew newTask = TaskNew()
+                                        ..checked = val!
+                                        ..header = oldTask.header
+                                        ..body = oldTask.body
+                                        ..marked = oldTask.marked;
+                                      setState(() {
+                                        Boxes.getTasks().putAt(index, newTask);
+                                      });
+                                    },
+                                  ),
                                 ),
                               ),
                             ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (showExpanded == index + 1) {
+                                    setState(() {
+                                      showExpanded = 0;
+                                    });
+                                  } else if (Boxes.getTasks().getAt(index)!.body != '') {
+                                    setState(() {
+                                      showExpanded = index + 1;
+                                    });
+                                  }
+                                },
+                                onDoubleTap: () {
+                                  TaskNew oldTask = Boxes.getTasks().getAt(index)!;
+                                  TaskNew newTask = TaskNew()
+                                    ..checked = oldTask.checked
+                                    ..header = oldTask.header
+                                    ..body = oldTask.body
+                                    ..marked = !oldTask.marked;
+                                  setState(() {
+                                    Boxes.getTasks().putAt(index, newTask);
+                                  });
+                                },
+                                child: Text(
+                                  Boxes.getTasks().getAt(index)!.header,
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                    color: (Boxes.getTasks().getAt(index)!.checked)
+                                        ? (Boxes.getTasks().getAt(index)!.marked)
+                                            ? CustomTheme.secondary()
+                                            : CustomTheme.textPrimaryNormal()
+                                        : (Boxes.getTasks().getAt(index)!.marked)
+                                            ? CustomTheme.primary()
+                                            : CustomTheme.textPrimaryStrong(),
+                                    decoration:
+                                        (Boxes.getTasks().getAt(index)!.checked) ? TextDecoration.lineThrough : null,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 42,
+                              height: 42,
+                              child: IconButton(
+                                splashRadius: 24,
+                                onPressed: () => openContainer(),
+                                icon: Icon(
+                                  Icons.edit_rounded,
+                                  color: CustomTheme.textPrimaryNormal(),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: (Platform.isAndroid || Platform.isIOS) ? 0 : 32,
+                            ),
                           ],
                         ),
-                      ),
-                    )));
-              },
-              child: AnimatedSize(
-                duration: const Duration(milliseconds: 600),
-                child: Container(
-                  key: UniqueKey(),
-                  margin: const EdgeInsets.only(
-                    left: 6.0,
-                    top: 8.0,
-                    right: 6.0,
-                  ),
-                  child: OpenContainer(
-                    tappable: false,
-                    transitionDuration: const Duration(milliseconds: 600),
-                    transitionType: ContainerTransitionType.fade,
-                    openColor: CustomTheme.boxTask(),
-                    openShape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                    openElevation: 0.0,
-                    closedColor: CustomTheme.boxTask(),
-                    closedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                    closedElevation: 0.0,
-                    openBuilder: (context, _) => EditTask(index: index + 1),
-                    closedBuilder: (context, VoidCallback openContainer) => Container(
-                      padding: const EdgeInsets.all(2.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Center(
-                                child: SizedBox(
-                                  width: 42,
-                                  height: 42,
-                                  child: Transform.scale(
-                                    scale: 1.25,
-                                    child: Checkbox(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(5.0),
-                                      ),
-                                      value: Boxes.getTasks().getAt(index)!.checked,
-                                      activeColor: Colors.green,
-                                      onChanged: (val) {
-                                        TaskNew oldTask = Boxes.getTasks().getAt(index)!;
-                                        TaskNew newTask = TaskNew()
-                                          ..checked = val!
-                                          ..header = oldTask.header
-                                          ..body = oldTask.body
-                                          ..marked = oldTask.marked;
-                                        setState(() {
-                                          Boxes.getTasks().putAt(index, newTask);
-                                        });
-                                      },
-                                    ),
-                                  ),
+                        (showExpanded == index + 1)
+                            ? Container(
+                                margin: const EdgeInsets.only(
+                                  bottom: 8.0,
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    if (showExpanded == index + 1) {
-                                      setState(() {
-                                        showExpanded = 0;
-                                      });
-                                    } else if (Boxes.getTasks().getAt(index)!.body != '') {
-                                      setState(() {
-                                        showExpanded = index + 1;
-                                      });
-                                    }
-                                  },
-                                  onDoubleTap: () {
-                                    TaskNew oldTask = Boxes.getTasks().getAt(index)!;
-                                    TaskNew newTask = TaskNew()
-                                      ..checked = oldTask.checked
-                                      ..header = oldTask.header
-                                      ..body = oldTask.body
-                                      ..marked = !oldTask.marked;
                                     setState(() {
-                                      Boxes.getTasks().putAt(index, newTask);
+                                      showExpanded = 0;
                                     });
                                   },
-                                  child: Text(
-                                    Boxes.getTasks().getAt(index)!.header,
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
-                                      color: (Boxes.getTasks().getAt(index)!.checked)
-                                          ? (Boxes.getTasks().getAt(index)!.marked)
-                                              ? CustomTheme.secondary()
-                                              : CustomTheme.textPrimaryNormal()
-                                          : (Boxes.getTasks().getAt(index)!.marked)
-                                              ? CustomTheme.primary()
-                                              : CustomTheme.textPrimaryStrong(),
-                                      decoration:
-                                          (Boxes.getTasks().getAt(index)!.checked) ? TextDecoration.lineThrough : null,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 42,
-                                height: 42,
-                                child: IconButton(
-                                  splashRadius: 24,
-                                  onPressed: () => openContainer(),
-                                  icon: Icon(
-                                    Icons.edit_rounded,
-                                    color: CustomTheme.textPrimaryNormal(),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: (Platform.isAndroid || Platform.isIOS) ? 0 : 32,
-                              ),
-                            ],
-                          ),
-                          (showExpanded == index + 1)
-                              ? Container(
-                                  margin: const EdgeInsets.only(
-                                    bottom: 8.0,
-                                  ),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        showExpanded = 0;
-                                      });
-                                    },
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: 32,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            (Boxes.getTasks().getAt(index)!.body == '')
-                                                ? ''
-                                                : Boxes.getTasks().getAt(index)!.body,
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              color: (Boxes.getTasks().getAt(index)!.checked)
-                                                  ? CustomTheme.textSecondaryNormal()
-                                                  : CustomTheme.textSecondaryStrong(),
-                                            ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 32,
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          (Boxes.getTasks().getAt(index)!.body == '')
+                                              ? ''
+                                              : Boxes.getTasks().getAt(index)!.body,
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            color: (Boxes.getTasks().getAt(index)!.checked)
+                                                ? CustomTheme.textSecondaryNormal()
+                                                : CustomTheme.textSecondaryStrong(),
                                           ),
                                         ),
-                                        Container(
-                                          width: 24,
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                      Container(
+                                        width: 24,
+                                      ),
+                                    ],
                                   ),
-                                )
-                              : Container(),
-                        ],
-                      ),
+                                ),
+                              )
+                            : Container(),
+                      ],
                     ),
                   ),
                 ),

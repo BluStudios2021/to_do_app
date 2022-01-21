@@ -7,35 +7,31 @@ class Settings extends StatefulWidget {
   _SettingsState createState() => _SettingsState();
 }
 
-class _SettingsState extends State<Settings> with SingleTickerProviderStateMixin {
-  Color currentColor = CustomTheme.primary();
-  Color secondaryColor = CustomTheme.secondary();
-  Color previousColor = CustomTheme.primary();
-
-  List<Color> primaryColors = [
-    Colors.deepOrange,
-    Colors.red,
-    Colors.pink,
-    Colors.purple,
-    Colors.deepPurple,
-    Colors.indigo,
-    Colors.blue,
-    Colors.lightBlue,
-    Colors.cyan,
-    Colors.teal,
+class _SettingsState extends State<Settings> with TickerProviderStateMixin {
+  final List<Color> primaryColors = [
+    Colors.deepOrange[500]!,
+    Colors.red[500]!,
+    Colors.pink[500]!,
+    Colors.purple[500]!,
+    Colors.deepPurple[500]!,
+    Colors.indigo[500]!,
+    Colors.blue[500]!,
+    Colors.lightBlue[500]!,
+    Colors.cyan[500]!,
+    Colors.teal[500]!,
     Colors.green[800]!,
-    Colors.green,
-    Colors.lightGreen,
-    Colors.lime,
-    Colors.yellow,
-    Colors.amber,
-    Colors.orange,
-    Colors.brown,
-    Colors.grey,
-    Colors.blueGrey,
+    Colors.green[500]!,
+    Colors.lightGreen[500]!,
+    Colors.lime[500]!,
+    Colors.yellow[500]!,
+    Colors.amber[500]!,
+    Colors.orange[500]!,
+    Colors.brown[500]!,
+    Colors.grey[500]!,
+    Colors.blueGrey[500]!,
   ];
 
-  List<Color> secondaryColors = [
+  final List<Color> secondaryColors = [
     Colors.deepOrange[300]!,
     Colors.red[300]!,
     Colors.pink[300]!,
@@ -58,11 +54,26 @@ class _SettingsState extends State<Settings> with SingleTickerProviderStateMixin
     Colors.blueGrey[300]!,
   ];
 
-  late AnimationController controller;
+  Color primaryColor = CustomTheme.primary();
+  Color prevPrimaryColor = CustomTheme.primary();
+  Color secondaryColor = CustomTheme.secondary();
+
+  Color checkBoxColor = CustomTheme.checkBox();
+  Color prevCheckBoxColor = CustomTheme.checkBox();
+  Color checkColor = CustomTheme.check();
+
+  int expanded = 0;
+
+  late AnimationController controllerPrimary;
+  late AnimationController controllerCheckBox;
 
   @override
   void initState() {
-    controller = AnimationController(
+    controllerPrimary = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    controllerCheckBox = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
@@ -76,7 +87,7 @@ class _SettingsState extends State<Settings> with SingleTickerProviderStateMixin
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 50),
         child: AnimatedBuilder(
-          animation: controller,
+          animation: controllerPrimary,
           builder: (context, child) {
             return Container(
               alignment: Alignment.centerLeft,
@@ -92,9 +103,9 @@ class _SettingsState extends State<Settings> with SingleTickerProviderStateMixin
                   bottomRight: Radius.circular(8.0),
                 ),
                 color: ColorTween(
-                  begin: previousColor,
-                  end: currentColor,
-                ).evaluate(controller),
+                  begin: prevPrimaryColor,
+                  end: primaryColor,
+                ).evaluate(controllerPrimary),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
@@ -124,91 +135,284 @@ class _SettingsState extends State<Settings> with SingleTickerProviderStateMixin
           },
         ),
       ),
-      body: Container(
-        margin: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: CustomTheme.boxTask(),
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GridView(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5,
-                crossAxisSpacing: 10.0,
-                mainAxisSpacing: 10.0,
-              ),
-              padding: const EdgeInsets.only(
-                left: 16.0,
-                top: 16.0,
-                right: 16.0,
-                bottom: 12.0,
-              ),
-              children: [
-                for (int i = 0; i < 20; i++)
-                  GestureDetector(
-                    onTap: () async {
-                      setState(() {
-                        previousColor = currentColor;
-                        currentColor = primaryColors[i];
-                        secondaryColor = secondaryColors[i];
-                      });
-                      controller.reset();
-                      await controller.forward();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        color: primaryColors[i],
-                        shape: BoxShape.circle,
-                      ),
-                      child: (primaryColors.indexOf(currentColor) == i)
-                          ? const FittedBox(
-                              child: Icon(
-                                Icons.check_rounded,
-                              ),
-                            )
-                          : null,
+      body: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: CustomTheme.taskBox(),
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              reverseDuration: const Duration(milliseconds: 200),
+              alignment: Alignment.topRight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: const EdgeInsets.only(
+                      left: 12.0,
+                      top: 6.0,
+                      right: 12.0,
+                      bottom: 6.0,
                     ),
-                  )
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                right: 12.0,
-                bottom: 2.0,
-              ),
-              child: TextButton(
-                onPressed: () {
-                  setState(() {
-                    CustomTheme.setPrimary(currentColor);
-                    CustomTheme.setSecondary(secondaryColor);
-                  });
-                  Navigator.pop(context);
-                },
-                child: AnimatedBuilder(
-                  animation: controller,
-                  builder: (context, child) {
-                    return Text(
-                      'Done',
-                      style: TextStyle(
-                        fontSize: 32,
-                        color: ColorTween(
-                          begin: previousColor,
-                          end: currentColor,
-                        ).evaluate(controller),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (expanded == 1) {
+                          setState(() {
+                            expanded = 0;
+                            prevPrimaryColor = primaryColor;
+                            primaryColor = CustomTheme.primary();
+                            controllerPrimary.reset();
+                            controllerPrimary.forward();
+                          });
+                        } else {
+                          setState(() {
+                            expanded = 1;
+                            // check color = CustomTheme.checkColor
+                          });
+                        }
+                      },
+                      child: AnimatedBuilder(
+                        animation: controllerPrimary,
+                        builder: (context, child) {
+                          return Text(
+                            'Primary color',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w500,
+                              color: ColorTween(
+                                begin: prevPrimaryColor,
+                                end: primaryColor,
+                              ).evaluate(controllerPrimary),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                  (expanded != 1)
+                      ? const SizedBox()
+                      : GridView(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5,
+                            crossAxisSpacing: 10.0,
+                            mainAxisSpacing: 10.0,
+                          ),
+                          padding: const EdgeInsets.only(
+                            left: 16.0,
+                            top: 16.0,
+                            right: 16.0,
+                            bottom: 12.0,
+                          ),
+                          children: [
+                            for (int i = 0; i < 20; i++)
+                              GestureDetector(
+                                onTap: () async {
+                                  setState(() {
+                                    prevPrimaryColor = primaryColor;
+                                    primaryColor = primaryColors[i];
+                                    secondaryColor = secondaryColors[i];
+                                  });
+                                  controllerPrimary.reset();
+                                  await controllerPrimary.forward();
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(10.0),
+                                  decoration: BoxDecoration(
+                                    color: primaryColors[i],
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: (primaryColors.indexOf(primaryColor) == i)
+                                      ? const FittedBox(
+                                          child: Icon(
+                                            Icons.check_rounded,
+                                          ),
+                                        )
+                                      : const SizedBox(),
+                                ),
+                              )
+                          ],
+                        ),
+                  (expanded != 1)
+                      ? const SizedBox()
+                      : Padding(
+                          padding: const EdgeInsets.only(
+                            right: 12.0,
+                            bottom: 2.0,
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                CustomTheme.setPrimary(primaryColor);
+                                CustomTheme.setSecondary(secondaryColor);
+                                expanded = 0;
+                              });
+                            },
+                            child: AnimatedBuilder(
+                              animation: controllerPrimary,
+                              builder: (context, child) {
+                                return Text(
+                                  'Done',
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    color: ColorTween(
+                                      begin: prevPrimaryColor,
+                                      end: primaryColor,
+                                    ).evaluate(controllerPrimary),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            reverseDuration: const Duration(milliseconds: 200),
+            alignment: Alignment.topRight,
+            child: Container(
+              margin: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: CustomTheme.taskBox(),
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: const EdgeInsets.only(
+                      left: 12.0,
+                      top: 6.0,
+                      right: 12.0,
+                      bottom: 6.0,
+                    ),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (expanded == 2) {
+                          setState(() {
+                            expanded = 0;
+                            prevCheckBoxColor = checkBoxColor;
+                            checkBoxColor = CustomTheme.checkBox();
+                            controllerCheckBox.reset();
+                            controllerCheckBox.forward();
+                          });
+                        } else {
+                          setState(() {
+                            expanded = 2;
+                            // check color = CustomTheme.checkColor
+                          });
+                        }
+                      },
+                      child: AnimatedBuilder(
+                        animation: controllerCheckBox,
+                        builder: (context, child) {
+                          return Text(
+                            'Checkbox color',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w500,
+                              color: ColorTween(
+                                begin: prevCheckBoxColor,
+                                end: checkBoxColor,
+                              ).evaluate(controllerCheckBox),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  (expanded != 2)
+                      ? const SizedBox()
+                      : GridView(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5,
+                            crossAxisSpacing: 10.0,
+                            mainAxisSpacing: 10.0,
+                          ),
+                          padding: const EdgeInsets.only(
+                            left: 16.0,
+                            top: 16.0,
+                            right: 16.0,
+                            bottom: 12.0,
+                          ),
+                          children: [
+                            for (int i = 0; i < 20; i++)
+                              GestureDetector(
+                                onTap: () async {
+                                  setState(() {
+                                    prevCheckBoxColor = checkBoxColor;
+                                    checkBoxColor = primaryColors[i];
+                                    secondaryColor = secondaryColors[i];
+                                  });
+                                  controllerCheckBox.reset();
+                                  await controllerCheckBox.forward();
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(10.0),
+                                  decoration: BoxDecoration(
+                                    color: primaryColors[i],
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: (primaryColors.indexOf(checkBoxColor) == i)
+                                      ? const FittedBox(
+                                          child: Icon(
+                                            Icons.check_rounded,
+                                          ),
+                                        )
+                                      : const SizedBox(),
+                                ),
+                              )
+                          ],
+                        ),
+                  (expanded != 2)
+                      ? const SizedBox()
+                      : Padding(
+                          padding: const EdgeInsets.only(
+                            right: 12.0,
+                            bottom: 2.0,
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                CustomTheme.setCheckBox(checkBoxColor);
+                                expanded = 0;
+                              });
+                            },
+                            child: AnimatedBuilder(
+                              animation: controllerCheckBox,
+                              builder: (context, child) {
+                                return Text(
+                                  'Done',
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    color: ColorTween(
+                                      begin: prevCheckBoxColor,
+                                      end: checkBoxColor,
+                                    ).evaluate(controllerCheckBox),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
