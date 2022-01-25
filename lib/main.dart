@@ -13,11 +13,18 @@ void main() async {
   await Hive.openBox<TaskNew>('tasks_new');
   await Hive.openBox<Color>('colors');
 
+  List<TaskNew> tasks = <TaskNew>[];
+
   for (int i = 0; i < Hive.box<TaskNew>('tasks_new').length; i++) {
     if (Hive.box<TaskNew>('tasks_new').getAt(i)!.checked) {
-      Hive.box<TaskNew>('tasks_new').deleteAt(i);
+      tasks.add(Hive.box<TaskNew>('tasks_new').getAt(i)!);
     }
   }
+
+  for (int i = 0; i < tasks.length; i++) {
+    Hive.box<TaskNew>('tasks_new').delete(tasks[i].key);
+  }
+
   runApp(const MyApp());
 }
 
