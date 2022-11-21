@@ -59,7 +59,19 @@ class _EditTaskState extends State<EditTask> {
 
       if (index == 0) {
         setState(() {
-          Boxes.getTasks().add(task);
+          List<TaskNew> tasks = List.empty(growable: true);
+
+          tasks.add(task);
+
+          for (int i = 0; i < Boxes.getTasks().length; i++) {
+            tasks.add(Boxes.getTasks().getAt(i)!);
+          }
+
+          Boxes.getTasks().deleteAll(Boxes.getTasks().keys);
+
+          for (TaskNew t in tasks) {
+            Boxes.getTasks().add(t);
+          }
         });
       } else {
         setState(() {
